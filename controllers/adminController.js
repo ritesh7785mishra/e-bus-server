@@ -30,20 +30,24 @@ module.exports.addConductor = async function addConductor(req, res) {
           message: "Conductor Added Successfully",
           data: conductor,
           location: locationData,
+          success: true,
         });
       } else {
         res.json({
           message: "Not able to create conductor in conductorModel",
+          success: false,
         });
       }
     } else {
       res.json({
         message: "not able to create conductor in tom tom api",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -59,15 +63,18 @@ module.exports.getConductor = async function getConductor(req, res) {
       res.json({
         message: "conductor retreived successfully",
         data: conductor,
+        success: true,
       });
     } else {
       res.json({
         message: "conductor details not found",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -99,16 +106,19 @@ module.exports.deleteConductor = async function deleteConductor(req, res) {
           message: "conductor deleted Successfully",
           data: deletedConductor,
           lastLocation: deletedLocation,
+          success: true,
         });
       } else {
         res.json({
           message: "conductor not found",
+          success: false,
         });
       }
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -140,15 +150,18 @@ module.exports.updateConductor = async function updateConductor(req, res) {
       res.json({
         message: "data updated Successfully",
         data: updatedDataInMongoDb,
+        success: true,
       });
     } else {
       res.json({
         message: "id not found in mongoDb",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -161,15 +174,18 @@ module.exports.getAllConductor = async function getAllConductor(req, res) {
       res.json({
         message: "All conductors data retreived Successfully",
         data: allConductors,
+        success: true,
       });
     } else {
       res.json({
         message: "conductors not found",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };

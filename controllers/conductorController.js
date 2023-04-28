@@ -3,6 +3,8 @@ const locationModel = require("../models/locationModel");
 const jwt = require("jsonwebtoken");
 const { apiKey, adminKey, baseUrl, JWT_KEY } = process.env;
 
+const { validationResult } = require("express-validator");
+
 //getConductor Profile
 
 module.exports.getConductorProfile = async function getConductorProfile(
@@ -10,7 +12,13 @@ module.exports.getConductorProfile = async function getConductorProfile(
   res
 ) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let { conductorAuthToken } = req.body;
+
     let payload = jwt.verify(conductorAuthToken, JWT_KEY);
 
     if (payload) {
@@ -21,15 +29,18 @@ module.exports.getConductorProfile = async function getConductorProfile(
         name: conductor.name,
         conductorId: conductor.properties.conductorId,
         id: conductor.id,
+        success: true,
       });
     } else {
       res.json({
         message: "conductor not found",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -52,15 +63,18 @@ module.exports.updateConductorRoute = async function updateConductorRoute(
       res.json({
         message: "updated Route successfully",
         data: updateRoute,
+        success: true,
       });
     } else {
       res.json({
         message: "not able to update Route",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -82,15 +96,18 @@ module.exports.addCurrentLocation = async function addCurrentLocation(
       res.json({
         message: "route updated Successfully",
         data: updateRoute,
+        success: true,
       });
     } else {
       res.json({
         message: "not able to update route in locationModel",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -107,12 +124,21 @@ module.exports.seatStatusUpdate = async function seatStatusUpdate(req, res) {
     );
 
     if (updateSeatStatus) {
-      res.json("Seat Status updated Successfully");
+      res.json({
+        message: "Seat status updated successfully",
+        success: true,
+      });
     } else {
-      res.json("Not able to update seat status");
+      res.json({
+        message: "not able to update seat status",
+        success: false,
+      });
     }
   } catch (error) {
-    res.json(error.message);
+    res.json({
+      message: error.message,
+      success: false,
+    });
   }
 };
 

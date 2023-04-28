@@ -3,12 +3,19 @@ const { JWT_KEY } = process.env;
 const jwt = require("jsonwebtoken");
 const { sendMail } = require("../utility/nodemailer");
 
+const { validationResult } = require("express-validator");
+
 const bcrypt = require("bcryptjs");
 
 //sign up user
 
 module.exports.userSignup = async function userSignup(req, res) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let dataObj = req.body;
     const salt = await bcrypt.genSalt(10);
     let secPassword = await bcrypt.hash(req.body.password, salt);
@@ -23,15 +30,18 @@ module.exports.userSignup = async function userSignup(req, res) {
       res.json({
         message: "user signed up",
         data: user,
+        success: true,
       });
     } else {
       res.json({
         message: "not able to make user in userModel",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -40,6 +50,11 @@ module.exports.userSignup = async function userSignup(req, res) {
 
 module.exports.userLogin = async function userLogin(req, res) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let data = req.body;
     const { password } = data;
 
@@ -61,25 +76,30 @@ module.exports.userLogin = async function userLogin(req, res) {
             message: "user has logged in ",
             data: user,
             authToken: token,
+            success: true,
           });
         } else {
           return res.json({
             message: "Wrong credentials",
+            success: false,
           });
         }
       } else {
         return res.json({
           message: "user not found",
+          success: false,
         });
       }
     } else {
       res.json({
         message: "Empty field found",
+        success: false,
       });
     }
   } catch (error) {
     res.status(500).json({
       message: error.message,
+      success: false,
     });
   }
 };
@@ -124,8 +144,8 @@ module.exports.userProtectRoute = async function userProtectRoute(
 };
 
 module.exports.userLogout = function userLogout(req, res) {
-  res.cookie("userLogin", "", { maxAge: 1 });
   res.json({
     message: "user logged out successfully",
+    success: true,
   });
 };

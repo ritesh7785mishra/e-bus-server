@@ -11,12 +11,21 @@ const {
   getConductorProfile,
   seatStatusUpdate,
 } = require("../controllers/conductorController");
+
+const {
+  loginConductorValidator,
+  getConductorValidator,
+} = require("../validators/conductorValidator");
 const conductorRouter = express.Router();
 
-conductorRouter.route("/conductor-login").post(conductorLogin);
-conductorRouter.route("/conductor-profile").post(getConductorProfile);
+conductorRouter
+  .route("/conductor-login")
+  .post(loginConductorValidator, conductorLogin);
+conductorRouter
+  .route("/conductor-profile")
+  .post(getConductorValidator, getConductorProfile);
 // conductorRouter.use(protectConductorRoute);
-conductorRouter.route("/conductor-profile").get(getConductorProfile);
+// conductorRouter.route("/conductor-profile").get(getConductorProfile);
 
 conductorRouter.route("/update-current-route").patch(updateConductorRoute);
 conductorRouter.route("/update-location").patch(addCurrentLocation);

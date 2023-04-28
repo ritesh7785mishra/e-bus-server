@@ -14,15 +14,21 @@ const {
   getAllBuses,
 } = require("../controllers/userController");
 
+const {
+  signupUserValidator,
+  loginUserValidator,
+  getUserValidator,
+} = require("../validators/userValidator");
+
 const userRouter = express.Router();
 
-userRouter.route("/user-signup").post(userSignup);
-userRouter.route("/user-login").post(userLogin);
+userRouter.route("/user-signup").post(signupUserValidator, userSignup);
+userRouter.route("/user-login").post(loginUserValidator, userLogin);
 userRouter.route("/all-buses").get(getAllBuses);
 userRouter.route("/route-selected-buses").post(routeSelectedBuses);
 userRouter.route("/profile/:id").patch(updateUser).delete(deleteUser);
 userRouter.route("/logout").get(userLogout);
 // userRouter.use(userProtectRoute);
-userRouter.route("/user-profile").post(getUser);
+userRouter.route("/user-profile").post(getUserValidator, getUser);
 
 module.exports = userRouter;

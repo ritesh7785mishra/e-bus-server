@@ -1,4 +1,5 @@
 const conductorModel = require("../models/conductorModel");
+const { validationResult } = require("express-validator");
 
 const jwt = require("jsonwebtoken");
 const { JWT_KEY } = process.env;
@@ -6,6 +7,11 @@ const { JWT_KEY } = process.env;
 //conductor login
 module.exports.conductorLogin = async function conductorLogin(req, res) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     let data = req.body;
 
     if (data.email) {
@@ -22,25 +28,30 @@ module.exports.conductorLogin = async function conductorLogin(req, res) {
             message: "conductor logged in successfully",
             conductor: conductor,
             conductorAuthToken: token,
+            success: true,
           });
         } else {
           res.json({
             message: "Wrong credentials",
+            success: false,
           });
         }
       } else {
         res.json({
           message: "user not found",
+          success: false,
         });
       }
     } else {
       res.json({
         message: "Please enter your email",
+        success: false,
       });
     }
   } catch (error) {
     res.json({
       message: error.message,
+      success: false,
     });
   }
 };
