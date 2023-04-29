@@ -10,14 +10,14 @@ const conductorRouter = require("./routers/conductorRouter");
 const userRouter = require("./routers/userRouter");
 const bodyParser = require("body-parser");
 
-const { frontendUrl } = process.env;
+// const { frontendUrl } = process.env;
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: frontendUrl,
+    origin: "https://e-savari.netlify.app/",
   })
 );
 app.listen(3000);
