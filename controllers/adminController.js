@@ -8,7 +8,7 @@ module.exports.addConductor = async function addConductor(req, res) {
   try {
     let dataObj = req.body;
 
-    const response = await fetch(
+    const response = await axios(
       `https://api.tomtom.com/locationHistory/1/objects/object?key=${apiKey}&adminKey=${adminKey}`,
       {
         method: "POST",
@@ -17,7 +17,7 @@ module.exports.addConductor = async function addConductor(req, res) {
       }
     );
 
-    const data = await response.json();
+    const data = await response;
 
     console.log(data);
 
