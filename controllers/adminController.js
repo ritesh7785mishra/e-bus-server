@@ -7,19 +7,25 @@ const locationModel = require("../models/locationModel");
 module.exports.addConductor = async function addConductor(req, res) {
   try {
     let dataObj = req.body;
+    console.log("This is data ", dataObj);
 
-    const response = await axios(
-      `https://api.tomtom.com/locationHistory/1/objects/object?key=${apiKey}&adminKey=${adminKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dataObj),
-      }
-    );
+    const response = await axios
+      .post(
+        `https://api.tomtom.com/locationHistory/1/objects/object?key=${apiKey}&adminKey=${adminKey}`,
+        {
+          ...dataObj,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .catch((err) => {
+        console.log(err.message);
+      });
 
-    const data = await response;
-
-    console.log(data);
+    let data = await response.data;
 
     if (data) {
       let conductor = await conductorModel.create(data);
