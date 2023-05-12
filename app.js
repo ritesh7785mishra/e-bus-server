@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "https://e-savari.netlify.app",
+    origin: ["http://localhost:5173", "https://e-savari.netlify.app"],
   })
 );
 app.listen(3000);
