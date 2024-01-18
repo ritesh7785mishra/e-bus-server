@@ -3,47 +3,43 @@ mongoose.set("strictQuery", true);
 const emailValidator = require("email-validator");
 // const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 const { db_link } = process.env;
 
 mongoose
-  .connect(db_link)
-  .then(function (db) {
-    console.log("user data base connected");
-  })
-  .catch((err) => {
-    console.log("error");
-  });
+	.connect(db_link)
+	.then(function (db) {
+		console.log("user data base connected");
+	})
+	.catch((err) => {
+		console.log("error");
+	});
 
 const userSchema = mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minLength: 8,
-  },
-  subscribed: {
-    type: Boolean,
-    default: true,
-  },
-  confirmPassword: {
-    type: String,
-    required: true,
-    minLength: 8,
-  },
-  profileImage: {
-    type: String,
-    default: "img/users/default.jpeg",
-  },
-  resetToken: String,
+	name: {
+		type: String,
+		required: true,
+	},
+	email: {
+		type: String,
+		required: true,
+		unique: true,
+	},
+	// password: {
+	//   type: String,
+	//   required: true,
+	//   minLength: 8,
+	// }, will be handled by passport local mongoose.
+	subscribed: {
+		type: Boolean,
+		default: true,
+	},
+	profileImage: {
+		type: String,
+		default: "img/users/default.jpeg",
+	},
+	// resetToken: String,
 });
 
 // userSchema.pre("save", function () {
@@ -74,6 +70,8 @@ const userSchema = mongoose.Schema({
 //   this.confirmPassword = confirmPassword;
 //   this.resetToken = undefined;
 // };
+
+userSchema.plugin(passportLocalMongoose); //always apply on schema
 
 const userModel = mongoose.model("userModel", userSchema);
 

@@ -2,144 +2,159 @@ const conductorModel = require("../models/conductorModel");
 const locationModel = require("../models/locationModel");
 const jwt = require("jsonwebtoken");
 const { apiKey, adminKey, baseUrl, JWT_KEY } = process.env;
+const bcrypt = require("bcrypt");
+const { createToken } = require("../utility/utility");
 
-const { validationResult } = require("express-validator");
+async function conductorLogin(req, res) {
+	try {
+		const { email, password } = req.body;
+		const conductor = await conductorModel.findOne({ email });
+		if (conductor) {
+			console.log(password, conductor.password);
+			const match = await bcrypt.compare(password, conductor.password);
+
+			if (match) {
+				const token = createToken(conductor._id);
+
+				return res.json({
+					msg: "conductor logged in successfully",
+					token,
+					success: true,
+				});
+			} else {
+				return res.json({
+					msg: "invalid credentials",
+					success: false,
+				});
+			}
+		} else {
+			return res.json({
+				msg: "invalid credentials",
+				success: false,
+			});
+		}
+	} catch (error) {
+		console.log(error.message, "conductor login error");
+	}
+}
 
 //getConductor Profile
-
-module.exports.getConductorProfile = async function getConductorProfile(
-  req,
-  res
-) {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({ errors: errors.array() });
-    }
-
-    let { conductorAuthToken } = req.body;
-
-    let payload = jwt.verify(conductorAuthToken, JWT_KEY);
-
-    if (payload) {
-      const conductor = await conductorModel.findById(payload.payload);
-      console.log("This function called,", payload.payload);
-      console.log("This is founded conductor", conductor);
-      res.json({
-        name: conductor.name,
-        conductorId: conductor.properties.conductorId,
-        id: conductor.id,
-        success: true,
-      });
-    } else {
-      res.json({
-        message: "conductor not found",
-        success: false,
-      });
-    }
-  } catch (error) {
-    res.json({
-      message: error.message,
-      success: false,
-    });
-  }
-};
+async function getConductor(req, res) {
+	try {
+		const id = req.userId;
+		console.log("req.userId", id);
+		const conductor = await conductorModel.findById(id);
+		if (conductor) {
+			res.json({
+				msg: "here is your conductor data",
+				success: true,
+				conductor,
+			});
+		} else {
+			res.json({
+				msg: "not able to found conductor",
+				success: false,
+			});
+		}
+	} catch (error) {
+		console.log(error.message);
+	}
+}
 
 //get the updated Route by the conductor
-module.exports.updateConductorRoute = async function updateConductorRoute(
-  req,
-  res
-) {
-  try {
-    const { id, currentRoute } = req.body;
+async function updateConductorRoute(req, res) {
+	try {
+		const { conductor_id, currentRoute } = req.body;
 
-    const updateRoute = await locationModel.findOneAndUpdate(
-      { id: id },
-      { $set: { currentRoute: currentRoute } },
-      { new: true }
-    );
+		const updateRoute = await locationModel.findOneAndUpdate(
+			{ conductor_id: conductor_id },
+			{ $set: { currentRoute: currentRoute } },
+			{ new: true }
+		);
 
-    if (updateRoute) {
-      res.json({
-        message: "updated Route successfully",
-        data: updateRoute,
-        success: true,
-      });
-    } else {
-      res.json({
-        message: "not able to update Route",
-        success: false,
-      });
-    }
-  } catch (error) {
-    res.json({
-      message: error.message,
-      success: false,
-    });
-  }
-};
+		if (updateRoute) {
+			res.json({
+				message: "updated Route successfully",
+				data: updateRoute,
+				success: true,
+			});
+		} else {
+			res.json({
+				message: "not able to update Route",
+				success: false,
+			});
+		}
+	} catch (error) {
+		res.json({
+			message: error.message,
+			success: false,
+		});
+	}
+}
 
 //get current location of the conductor
-module.exports.addCurrentLocation = async function addCurrentLocation(
-  req,
-  res
-) {
-  try {
-    const { id, longlat } = req.body;
-    const updateRoute = await locationModel.findOneAndUpdate(
-      { id: id },
-      { $set: { currentLocation: longlat } },
-      { new: true }
-    );
+async function addCurrentLocation(req, res) {
+	try {
+		const { conductor_id, longlat } = req.body;
+		const updateRoute = await locationModel.findOneAndUpdate(
+			{ id: conductor_id },
+			{ $set: { currentLocation: longlat } },
+			{ new: true }
+		);
 
-    if (updateRoute) {
-      res.json({
-        message: "route updated Successfully",
-        data: updateRoute,
-        success: true,
-      });
-    } else {
-      res.json({
-        message: "not able to update route in locationModel",
-        success: false,
-      });
-    }
-  } catch (error) {
-    res.json({
-      message: error.message,
-      success: false,
-    });
-  }
-};
+		if (updateRoute) {
+			res.json({
+				message: "route updated Successfully",
+				data: updateRoute,
+				success: true,
+			});
+		} else {
+			res.json({
+				message: "not able to update route in locationModel",
+				success: false,
+			});
+		}
+	} catch (error) {
+		res.json({
+			message: error.message,
+			success: false,
+		});
+	}
+}
 
 //udpate seatStatus
-module.exports.seatStatusUpdate = async function seatStatusUpdate(req, res) {
-  try {
-    const seatStatus = req.body.seatStatus;
-    const id = req.body.id;
-    const updateSeatStatus = await locationModel.findOneAndUpdate(
-      { id: id },
-      { $set: { seatStatus: seatStatus } },
-      { new: true }
-    );
+async function seatStatusUpdate(req, res) {
+	try {
+		const { conductor_id, seatStatus } = req.body;
+		const updateSeatStatus = await locationModel.findOneAndUpdate(
+			{ conductor_id: conductor_id },
+			{ $set: { seatStatus: seatStatus } },
+			{ new: true }
+		);
 
-    if (updateSeatStatus) {
-      res.json({
-        message: "Seat status updated successfully",
-        success: true,
-      });
-    } else {
-      res.json({
-        message: "not able to update seat status",
-        success: false,
-      });
-    }
-  } catch (error) {
-    res.json({
-      message: error.message,
-      success: false,
-    });
-  }
+		if (updateSeatStatus) {
+			res.json({
+				message: "Seat status updated successfully",
+				success: true,
+			});
+		} else {
+			res.json({
+				message: "not able to update seat status",
+				success: false,
+			});
+		}
+	} catch (error) {
+		res.json({
+			message: error.message,
+			success: false,
+		});
+	}
+}
+
+module.exports = {
+	updateConductorRoute,
+	addCurrentLocation,
+	seatStatusUpdate,
+	conductorLogin,
+	getConductor,
 };
-
-//signout from the location service

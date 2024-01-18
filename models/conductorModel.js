@@ -5,67 +5,49 @@ const { db_link } = process.env;
 const emailValidator = require("email-validator");
 
 mongoose
-  .connect(db_link)
-  .then((db) => {
-    console.log("conductor data base connected");
-  })
-  .catch((err) => {
-    console.log(err.message);
-  });
+	.connect(db_link)
+	.then((db) => {
+		console.log("conductor data base connected");
+	})
+	.catch((err) => {
+		console.log(err.message);
+	});
 
 const conductorSchema = mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  properties: {
-    email: {
-      type: String,
-      required: true,
-    },
-    conductorId: {
-      type: String,
-      required: true,
-    },
-    aadharNumber: {
-      type: Number,
-      required: true,
-    },
-    phoneNumber: {
-      type: Number,
-      required: true,
-    },
-    profileImage: {
-      type: String,
-      default: "img/users/default.jpeg",
-    },
-    password: {
-      type: String,
-      required: true,
-      minLength: 8,
-    },
-    confirmPassword: {
-      type: String,
-      required: true,
-      minLength: 8,
-    },
-    address: {
-      type: String,
-      required: true,
-    },
-    district: {
-      type: String,
-      required: true,
-    },
-    state: {
-      type: String,
-      required: true,
-    },
-  },
+	name: {
+		type: String,
+		required: true,
+		trim: true,
+	},
+
+	email: {
+		type: String,
+		required: true,
+		unique: true,
+		trim: true,
+	},
+	govt_id: {
+		type: String,
+		required: true,
+	},
+	aadhar_no: {
+		type: Number,
+		required: true,
+	},
+	contact_no: {
+		type: Number,
+		required: true,
+	},
+	profile_img: {
+		type: String,
+		default: "img/users/default.jpeg",
+	},
+	password: {
+		type: String,
+		required: true,
+		minLength: 8,
+		trim: true,
+	},
 });
 
 const conductorModel = mongoose.model("conductorModel", conductorSchema);
