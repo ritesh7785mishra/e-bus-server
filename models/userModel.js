@@ -1,12 +1,6 @@
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
-const emailValidator = require("email-validator");
-// const bcrypt = require("bcrypt");
-const crypto = require("crypto");
-const passportLocalMongoose = require("passport-local-mongoose");
-
 const { db_link } = process.env;
-
 mongoose
 	.connect(db_link)
 	.then(function (db) {
@@ -26,20 +20,23 @@ const userSchema = mongoose.Schema({
 		required: true,
 		unique: true,
 	},
-	// password: {
-	//   type: String,
-	//   required: true,
-	//   minLength: 8,
-	// }, will be handled by passport local mongoose.
+	password: {
+		type: String,
+		required: true,
+		minLength: 8,
+	},
 	subscribed: {
 		type: Boolean,
 		default: true,
+	},
+	contact_no: {
+		type: Number,
+		required: true,
 	},
 	profileImage: {
 		type: String,
 		default: "img/users/default.jpeg",
 	},
-	// resetToken: String,
 });
 
 // userSchema.pre("save", function () {
@@ -70,8 +67,6 @@ const userSchema = mongoose.Schema({
 //   this.confirmPassword = confirmPassword;
 //   this.resetToken = undefined;
 // };
-
-userSchema.plugin(passportLocalMongoose); //always apply on schema
 
 const userModel = mongoose.model("userModel", userSchema);
 

@@ -1,34 +1,22 @@
 const express = require("express");
-// const {
-//   userSignup,
-//   userLogin,
-//   userProtectRoute,
-//   userLogout,
-// } = require("../controllers/userAuthController");
-
 const {
 	getUser,
-	updateUser,
 	deleteUser,
 	routeSelectedBuses,
 	getAllBuses,
+	addUser,
+	userLogin,
 } = require("../controllers/userController");
-
-const {
-	signupUserValidator,
-	loginUserValidator,
-	getUserValidator,
-} = require("../validators/userValidator");
+const authMiddleware = require("../middleware");
 
 const userRouter = express.Router();
 
-// userRouter.route("/user-signup").post(signupUserValidator, userSignup);
-// userRouter.route("/user-login").post(loginUserValidator, userLogin);
-// userRouter.route("/all-buses").get(getAllBuses);
-// userRouter.route("/route-selected-buses").post(routeSelectedBuses);
-// userRouter.route("/profile/:id").patch(updateUser).delete(deleteUser);
-// userRouter.route("/logout").get(userLogout);
-// // userRouter.use(userProtectRoute);
-// userRouter.route("/user-profile").post(getUserValidator, getUser);
+userRouter.route("/signup").post(addUser);
+userRouter.route("/auth/login").post(userLogin);
+userRouter.use(authMiddleware);
+userRouter.route("/profile").get(getUser);
+userRouter.route("/all-buses").get(getAllBuses);
+userRouter.route("/route-selected-buses").post(routeSelectedBuses);
+userRouter.route("/delete").delete(deleteUser);
 
 module.exports = userRouter;
