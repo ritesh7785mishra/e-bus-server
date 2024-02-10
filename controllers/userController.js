@@ -104,7 +104,7 @@ async function getUser(req, res) {
 async function updateUser(req, res) {
 	try {
 		//updated data in users object
-		let id = req.params.id;
+		let id = req.userId;
 		let user = await userModel.findById(id);
 		let dataToBeUpdated = req.body;
 		if (user) {
