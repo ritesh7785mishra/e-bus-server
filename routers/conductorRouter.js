@@ -19,8 +19,14 @@ const conductorRouter = express.Router();
 conductorRouter.route("/auth/login").post(conductorLogin);
 conductorRouter.route("/profile").get(authMiddleware, getConductor);
 
-conductorRouter.route("/update-current-route").patch(updateConductorRoute);
-conductorRouter.route("/update-location").patch(addCurrentLocation);
-conductorRouter.route("/update-seat-status").patch(seatStatusUpdate);
+conductorRouter
+	.route("/update-current-route")
+	.patch(authMiddleware, updateConductorRoute);
+conductorRouter
+	.route("/update-location")
+	.patch(authMiddleware, addCurrentLocation);
+conductorRouter
+	.route("/update-seat-status")
+	.patch(authMiddleware, seatStatusUpdate);
 
 module.exports = conductorRouter;

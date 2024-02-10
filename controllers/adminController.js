@@ -8,7 +8,7 @@ const bcrypt = require("bcrypt");
 
 async function addAdmin(req, res) {
 	try {
-		const data = req.body;
+		let data = req.body;
 
 		if (data) {
 			const { password } = data;
@@ -45,12 +45,9 @@ async function adminLogin(req, res) {
 		const { email, password } = req.body;
 		const admin = await adminModel.findOne({ email });
 		if (admin) {
-			console.log(password, admin.password);
 			const match = await bcrypt.compare(password, admin.password);
-
 			if (match) {
 				const token = createToken(admin._id);
-
 				return res.json({
 					msg: "admin logged in successfully",
 					token,
@@ -153,40 +150,27 @@ async function deleteAdmin(req, res) {
 async function addConductor(req, res) {
 	try {
 		let data = req.body;
-		// console.log("This is data ", dataObj);
-
-		// const response = await axios
-		// 	.post(
-		// 		`https://api.tomtom.com/locationHistory/1/objects/object?key=${apiKey}&adminKey=${adminKey}`,
-		// 		{
-		// 			...dataObj,
-		// 		},
-		// 		{
-		// 			headers: {
-		// 				"Content-Type": "application/json",
-		// 			},
-		// 		}
-		// 	)
-		// 	.catch((err) => {
-		// 		console.log(err.message);
-		// 	});
-
-		// let data = await response.data;
 
 		if (data) {
-			let hash = await hashPassword(data.password);
+			const { password } = data;
+			const hash = await hashPassword(password);
 
-			let conductor = await conductorModel.create({ ...data, password: hash });
-
-			let locationData = await locationModel.create({
-				conductor_id: conductor._id,
+			const conductor = await conductorModel.create({
+				...data,
+				password: hash,
 			});
 
+			const token = await createToken(conductor._id);
+
 			if (conductor) {
+				let locationData = await locationModel.create({
+					conductor_id: conductor._id,
+				});
 				res.json({
 					message: "Conductor Added Successfully",
 					data: conductor,
 					location: locationData,
+					token: token,
 					success: true,
 				});
 			} else {

@@ -64,13 +64,18 @@ async function getConductor(req, res) {
 //get the updated Route by the conductor
 async function updateConductorRoute(req, res) {
 	try {
-		const { conductor_id, currentRoute } = req.body;
+		const id = req.userId;
+		const { currentRoute } = req.body;
+
+		console.log("this is called", currentRoute);
 
 		const updateRoute = await locationModel.findOneAndUpdate(
-			{ conductor_id: conductor_id },
+			{ conductor_id: id },
 			{ $set: { currentRoute: currentRoute } },
 			{ new: true }
 		);
+
+		console.log(updateRoute);
 
 		if (updateRoute) {
 			res.json({
@@ -85,6 +90,7 @@ async function updateConductorRoute(req, res) {
 			});
 		}
 	} catch (error) {
+		console.log(error.message);
 		res.json({
 			message: error.message,
 			success: false,
@@ -95,17 +101,18 @@ async function updateConductorRoute(req, res) {
 //get current location of the conductor
 async function addCurrentLocation(req, res) {
 	try {
-		const { conductor_id, longlat } = req.body;
-		const updateRoute = await locationModel.findOneAndUpdate(
-			{ id: conductor_id },
+		const id = req.userId;
+		const { longlat } = req.body;
+		const updatedLocation = await locationModel.findOneAndUpdate(
+			{ id: id },
 			{ $set: { currentLocation: longlat } },
 			{ new: true }
 		);
 
-		if (updateRoute) {
+		if (updatedLocation) {
 			res.json({
-				message: "route updated Successfully",
-				data: updateRoute,
+				message: "location updated Successfully",
+				data: updatedLocation,
 				success: true,
 			});
 		} else {
@@ -125,9 +132,10 @@ async function addCurrentLocation(req, res) {
 //udpate seatStatus
 async function seatStatusUpdate(req, res) {
 	try {
-		const { conductor_id, seatStatus } = req.body;
+		const id = req.userId;
+		const { seatStatus } = req.body;
 		const updateSeatStatus = await locationModel.findOneAndUpdate(
-			{ conductor_id: conductor_id },
+			{ conductor_id: id },
 			{ $set: { seatStatus: seatStatus } },
 			{ new: true }
 		);

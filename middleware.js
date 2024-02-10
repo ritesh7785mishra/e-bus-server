@@ -6,6 +6,9 @@ const { apiKey } = process.env;
 const authMiddleware = async (req, res, next) => {
 	const token = req.header("Authorization");
 
+	console.log("req", req.body);
+	console.log("token", token);
+
 	if (!token) {
 		return res.status(401).json({ message: "No token, authorization denied" });
 	}
@@ -14,17 +17,9 @@ const authMiddleware = async (req, res, next) => {
 		const decoded = jwt.verify(token, apiKey);
 		console.log("decoded", decoded);
 		req.userId = decoded._id;
-		// const admin = await adminModel.findById(decoded._id);
-		// if (admin) {
-		// 	next();
-		// } else {
-		// 	res.json({
-		// 		message: "not valid",
-		// 	});
-		// }
 		next();
 	} catch (error) {
-		console.error(error);
+		console.log(error.message);
 		res.status(401).json({ message: "Token is not valid" });
 	}
 };
